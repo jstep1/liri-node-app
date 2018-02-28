@@ -1,3 +1,4 @@
+// Require appropriate API sources, functions and keys
 require("dotenv").config();
 var fs = require("fs");
 
@@ -7,6 +8,8 @@ var Spotify = require('node-spotify-api');
 
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
+
+// Reference user input lines
 
 var command = process.argv[2];
 var userEntry = process.argv[3];
@@ -51,6 +54,8 @@ var showTweets = function() {
 
     }
 
+    // If no user input detected, default to 'The Sign' by Ace of Bass
+
     else {
         spotify.search({ type: 'track', query: 'The Sign'}, function(err, data) {
             if (err) {
@@ -67,7 +72,7 @@ var showTweets = function() {
 }
 
 
-// Information about a movie from OMDB
+// List movie information from OMDB database
 
 var runMov = function () {
 
@@ -105,25 +110,46 @@ var runMov = function () {
 }
 
 
-// Run function based on user input
+// Run specific function based on user input
+var runFunctions = function() {
 
-if(command === 'my-tweets') {
-    showTweets();
-}
-else if(command === 'spotify-this-song') {
-    runSpot();
-}
-else if(command === 'movie-this') {
-    runMov();
-}
-else if(command === 'do-what-it-says') {
-    // LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands
-    fs.readFile("random.txt", "utf8", function(err, data) {
+    if(command === 'my-tweets') {
+        showTweets();
+    }
+    else if(command === 'spotify-this-song') {
+        runSpot();
+    }
+    else if(command === 'movie-this') {
+        runMov();
+    }
+    else if(command === 'do-what-it-says') {
+        // LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands
+        fs.readFile("random.txt", "utf8", function(err, data) {
 
-        var display = data.split(",");
-        command = display[0];
-        userEntry = display[1];
-    
-        console.log(command, userEntry);
+            var display = data.split(",");
+            command = display[0];
+            userEntry = display[1];
+        
+            runFunctions();
+        })
+}}
+
+// BONUS: Aggregate each response and append to 'log.txt'
+
+var logToFile = function(input) {
+
+    fs.appendFile("log.txt", input, function(err) {
+
+    if (err) {
+        console.log(err);
+    }
+
     })
-}
+
+};
+
+// Initialize function
+
+runFunctions();
+
+
